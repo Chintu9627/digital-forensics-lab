@@ -1,51 +1,94 @@
-# **Digital Forensic Analysis Lab**
+\# 🔍 Digital Forensic Analysis Lab
 
 
 
-### What the Tool Is For:
+!\[License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-A toolkit to capture, analyze, and interpret digital forensic artifacts from
-memory dumps, disk images, and system logs — built for incident response and
-forensic investigation practice.
+!\[Python](https://img.shields.io/badge/python-3.x-yellow.svg)
 
+!\[Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)
 
-
-This project is based on the Digital Forensic Analysis Lab
-(https://github.com/aw-junaid/cybersec-projects/tree/main/Projects/Defensive/Digital%20forensic%20analysis%20lab)
-by Abdul Wahab Junaid (https://github.com/aw-junaid), used under the MIT License.
+!\[Status](https://img.shields.io/badge/status-active-success.svg)
 
 
 
-## **What I changed**
+A toolkit to \*\*capture, analyze, and interpret digital forensic artifacts\*\* from memory dumps, disk images, and system logs — built for incident response and forensic investigation practice.
 
 
 
-While testing the memory analysis module on Windows, I hit a runtime error in
-the string-extraction function:
+> Based on the \[Digital Forensic Analysis Lab](https://github.com/aw-junaid/cybersec-projects/tree/main/Projects/Defensive/Digital%20forensic%20analysis%20lab) by \[Abdul Wahab Junaid](https://github.com/aw-junaid), used under the MIT License. See \[What I Changed](#-what-i-changed) for the fix contributed in this fork.
+
+
+
+\---
+
+
+
+\## 📑 Table of Contents
+
+
+
+\- \[What I Changed](#-what-i-changed)
+
+\- \[How to Run](#-how-to-run)
+
+\- \[Algorithm Explanation](#-algorithm-explanation)
+
+&#x20; - \[Memory Analysis](#1-memory-analysis)
+
+&#x20; - \[Disk Analysis](#2-disk-analysis)
+
+&#x20; - \[Artifact Extraction](#3-artifact-extraction)
+
+&#x20; - \[Forensic Techniques](#4-forensic-techniques)
+
+\- \[License](#-license)
+
+
+
+\---
+
+
+
+\## 🛠 What I Changed
+
+
+
+While testing the memory analysis module on Windows, this error came up:
+
+
+
+```
 
 \[-] Error extracting strings: '<=' not supported between instances of 'int' and 'bytes'
 
-**Root cause:** the original code iterated directly over an open mmap
-object byte-by-byte. On this Python/Windows combination, that iteration
-returned bytes objects instead of plain integers, so the printable-ASCII
-range check (32 <= byte <= 126) failed.
-
-**Fix:** read the full mmap buffer into a bytes object first
-(data = mm.read()), then iterate over that. Iterating over a real bytes
-object always yields plain integers regardless of platform, which resolves
-the crash.
+```
 
 
 
-### How to run the code
+| | |
+
+|---|---|
+
+| \*\*Root cause\*\* | The original code iterated directly over an open `mmap` object byte-by-byte. On this Python/Windows combination, that iteration returned `bytes` objects instead of plain integers, so the printable-ASCII range check (`32 <= byte <= 126`) failed. |
+
+| \*\*Fix\*\* | Read the full `mmap` buffer into a `bytes` object first (`data = mm.read()`), then iterate over that. Iterating over a real `bytes` object always yields plain integers regardless of platform, which resolves the crash. |
 
 
 
-##### Python Version:
+\---
 
 
 
+\## ▶️ How to Run
 
+
+
+\### Python Version
+
+
+
+```bash
 
 \# Install dependencies
 
@@ -59,7 +102,7 @@ python3 forensic\_lab.py memory -i memory.dmp -o memory\_analysis.json
 
 
 
-\# Analyze disk image  
+\# Analyze disk image
 
 python3 forensic\_lab.py disk -i disk.img -o disk\_analysis.json
 
@@ -75,11 +118,19 @@ python3 forensic\_lab.py artifacts -i /evidence/ -o artifacts.json
 
 python3 forensic\_lab.py full -m memory.dmp -d disk.img -a /evidence/ -o full\_report.json
 
+```
 
 
-##### C Version:
+
+\### C Version
 
 
+
+> ⚠️ The bug fix above applies to the \*\*Python version only\*\* — the C version's string extraction was not part of this fix.
+
+
+
+```bash
 
 \# Compile with OpenSSL
 
@@ -103,13 +154,19 @@ gcc -o forensic\_lab forensic\_lab.c -lssl -lcrypto
 
 ./forensic\_lab report memory.dmp disk.img forensic\_report.txt
 
-
-
-### Algorithm Explanation
+```
 
 
 
-##### 1\. Memory Analysis
+\---
+
+
+
+\## 🧩 Algorithm Explanation
+
+
+
+\### 1. Memory Analysis
 
 
 
@@ -117,63 +174,79 @@ Memory analysis focuses on examining RAM captures to identify malicious activiti
 
 
 
-###### • Process Extraction
+<details>
 
-Identifies all running and terminated processes present in memory.
-
-Displays Process ID (PID), Parent Process ID (PPID), and process hierarchy.
-
-Helps detect suspicious or hidden processes often used by malware.
+<summary><strong>🔹 Process Extraction</strong></summary>
 
 
 
-Example: Detecting an unknown process running under explorer.exe.
+\- Identifies all running and terminated processes present in memory
+
+\- Displays Process ID (PID), Parent Process ID (PPID), and process hierarchy
+
+\- Helps detect suspicious or hidden processes often used by malware
+
+\- \*\*Example:\*\* Detecting an unknown process running under `explorer.exe`
+
+</details>
 
 
 
-###### • Network Analysis
+<details>
 
-Maps active and historical network connections to specific processes.
-
-Identifies source and destination IP addresses, ports, and protocols.
-
-Helps investigators determine whether a process communicated with external systems.
+<summary><strong>🔹 Network Analysis</strong></summary>
 
 
 
-Example: Finding a suspicious process connected to a remote server.
+\- Maps active and historical network connections to specific processes
+
+\- Identifies source and destination IP addresses, ports, and protocols
+
+\- Helps investigators determine whether a process communicated with external systems
+
+\- \*\*Example:\*\* Finding a suspicious process connected to a remote server
+
+</details>
 
 
 
-###### • String Extraction
+<details>
 
-Extracts readable ASCII and Unicode strings from memory dumps.
-
-Reveals usernames, passwords, URLs, file paths, and commands.
-
-Useful for uncovering hidden evidence left in RAM.
+<summary><strong>🔹 String Extraction</strong></summary>
 
 
 
-Example: Recovering a command-and-control server URL from memory.
+\- Extracts readable ASCII and Unicode strings from memory dumps
+
+\- Reveals usernames, passwords, URLs, file paths, and commands
+
+\- Useful for uncovering hidden evidence left in RAM
+
+\- \*\*Example:\*\* Recovering a command-and-control server URL from memory
+
+</details>
 
 
 
-###### • Malware Detection
+<details>
 
-Scans memory for suspicious indicators and malicious patterns.
-
-Identifies injected code, suspicious DLLs, and known malware signatures.
-
-Detects Indicators of Compromise (IOCs) that may suggest system compromise.
+<summary><strong>🔹 Malware Detection</strong></summary>
 
 
 
-Example: Detecting a malicious process injected into a legitimate application.
+\- Scans memory for suspicious indicators and malicious patterns
+
+\- Identifies injected code, suspicious DLLs, and known malware signatures
+
+\- Detects Indicators of Compromise (IOCs) that may suggest system compromise
+
+\- \*\*Example:\*\* Detecting a malicious process injected into a legitimate application
+
+</details>
 
 
 
-##### 2\. Disk Analysis
+\### 2. Disk Analysis
 
 
 
@@ -181,63 +254,79 @@ Disk analysis examines storage media to uncover files, logs, and system artifact
 
 
 
-###### • File System Analysis
+<details>
 
-Analyzes file system structures such as NTFS, FAT32, and EXT4.
-
-Extracts file metadata including creation, modification, and access times.
-
-Identifies hidden and suspicious files.
+<summary><strong>🔹 File System Analysis</strong></summary>
 
 
 
-Example: Investigating when a malicious file was created on a system.
+\- Analyzes file system structures such as NTFS, FAT32, and EXT4
+
+\- Extracts file metadata including creation, modification, and access times
+
+\- Identifies hidden and suspicious files
+
+\- \*\*Example:\*\* Investigating when a malicious file was created on a system
+
+</details>
 
 
 
-###### • Timeline Creation
+<details>
 
-Builds a chronological sequence of system events.
-
-Correlates file activity, user actions, and system logs.
-
-Helps reconstruct attack timelines.
+<summary><strong>🔹 Timeline Creation</strong></summary>
 
 
 
-Example: Determining the exact time malware was executed.
+\- Builds a chronological sequence of system events
+
+\- Correlates file activity, user actions, and system logs
+
+\- Helps reconstruct attack timelines
+
+\- \*\*Example:\*\* Determining the exact time malware was executed
+
+</details>
 
 
 
-###### • Deleted File Recovery
+<details>
 
-Attempts to recover files removed from the file system.
-
-Analyzes unallocated disk space for recoverable evidence.
-
-Supports forensic investigations involving data destruction.
+<summary><strong>🔹 Deleted File Recovery</strong></summary>
 
 
 
-Example: Recovering deleted documents related to an incident.
+\- Attempts to recover files removed from the file system
+
+\- Analyzes unallocated disk space for recoverable evidence
+
+\- Supports forensic investigations involving data destruction
+
+\- \*\*Example:\*\* Recovering deleted documents related to an incident
+
+</details>
 
 
 
-###### • Registry Analysis
+<details>
 
-Extracts artifacts from the Windows Registry.
-
-Identifies startup programs, installed software, USB devices, and user activity.
-
-Helps determine system configuration and persistence mechanisms.
+<summary><strong>🔹 Registry Analysis</strong></summary>
 
 
 
-Example: Finding malware configured to run automatically at startup.
+\- Extracts artifacts from the Windows Registry
+
+\- Identifies startup programs, installed software, USB devices, and user activity
+
+\- Helps determine system configuration and persistence mechanisms
+
+\- \*\*Example:\*\* Finding malware configured to run automatically at startup
+
+</details>
 
 
 
-##### 3\. Artifact Extraction
+\### 3. Artifact Extraction
 
 
 
@@ -245,57 +334,73 @@ Artifact extraction gathers evidence left behind by users and applications.
 
 
 
-###### • System Artifacts
+<details>
 
-Collects hostname, operating system details, and user account information.
-
-Provides a baseline understanding of the investigated machine.
+<summary><strong>🔹 System Artifacts</strong></summary>
 
 
 
-Example: Identifying the computer owner and operating system version.
+\- Collects hostname, operating system details, and user account information
+
+\- Provides a baseline understanding of the investigated machine
+
+\- \*\*Example:\*\* Identifying the computer owner and operating system version
+
+</details>
 
 
 
-###### • User Activity Artifacts
+<details>
 
-Retrieves recently opened files and executed commands.
-
-Analyzes clipboard history and user interaction records.
-
-Helps reconstruct user behavior.
+<summary><strong>🔹 User Activity Artifacts</strong></summary>
 
 
 
-Example: Discovering recently accessed sensitive documents.
+\- Retrieves recently opened files and executed commands
+
+\- Analyzes clipboard history and user interaction records
+
+\- Helps reconstruct user behavior
+
+\- \*\*Example:\*\* Discovering recently accessed sensitive documents
+
+</details>
 
 
 
-###### • Network Artifacts
+<details>
 
-Extracts ARP cache entries, DNS records, and connection history.
-
-Identifies systems previously contacted by the device.
+<summary><strong>🔹 Network Artifacts</strong></summary>
 
 
 
-Example: Finding communication with suspicious domains.
+\- Extracts ARP cache entries, DNS records, and connection history
+
+\- Identifies systems previously contacted by the device
+
+\- \*\*Example:\*\* Finding communication with suspicious domains
+
+</details>
 
 
 
-###### • Application Artifacts
+<details>
 
-Analyzes browser history, downloads, cookies, and email data.
-
-Extracts evidence from communication and productivity applications.
+<summary><strong>🔹 Application Artifacts</strong></summary>
 
 
 
-Example: Investigating whether a user visited phishing websites.
+\- Analyzes browser history, downloads, cookies, and email data
+
+\- Extracts evidence from communication and productivity applications
+
+\- \*\*Example:\*\* Investigating whether a user visited phishing websites
+
+</details>
 
 
 
-##### 4\. Forensic Techniques
+\### 4. Forensic Techniques
 
 
 
@@ -303,63 +408,27 @@ These techniques ensure evidence integrity and support accurate investigations.
 
 
 
-###### • Hashing
+| Technique | What It Does | Example |
 
-Generates cryptographic hashes (MD5, SHA-1, SHA-256) for files.
+|---|---|---|
 
-Verifies file integrity and detects modifications.
+| \*\*Hashing\*\* | Generates cryptographic hashes (MD5, SHA-1, SHA-256) for files; verifies file integrity and detects modifications | Comparing hashes before and after acquisition |
 
-Ensures evidence remains unchanged during analysis.
+| \*\*Timeline Analysis\*\* | Correlates events from multiple evidence sources; identifies relationships between activities and incidents | Linking file creation, execution, and network activity |
 
+| \*\*Pattern Matching\*\* | Searches evidence for known malicious indicators using regex and IOC databases | Matching extracted artifacts against known threat indicators |
 
-
-Example: Comparing hashes before and after acquisition.
-
-
-
-###### • Timeline Analysis
-
-Correlates events from multiple evidence sources.
-
-Identifies relationships between activities and incidents.
-
-Assists in reconstructing attack chains.
+| \*\*Metadata Analysis\*\* | Extracts hidden information — authorship, timestamps, GPS data, software used | Identifying the creator and modification history of a document |
 
 
 
-Example: Linking file creation, execution, and network activity.
+\---
 
 
 
-###### • Pattern Matching
-
-Searches evidence for known malicious indicators.
-
-Uses regular expressions and IOC databases.
-
-Detects suspicious IP addresses, domains, URLs, and file hashes.
+\## 📄 License
 
 
 
-Example: Matching extracted artifacts against known threat indicators.
-
-
-
-###### • Metadata Analysis
-
-Extracts hidden information from files and documents.
-
-Reveals authorship, timestamps, GPS data, and software used.
-
-Provides additional context during investigations.
-
-
-
-Example: Identifying the creator and modification history of a document.
-
-
-
-### License
-
-MIT — see LICENSE file. Original work copyright (c) 2025 Abdul Wahab Junaid.
+MIT — see \[LICENSE](./LICENSE). Original work copyright (c) 2025 Abdul Wahab Junaid.
 
